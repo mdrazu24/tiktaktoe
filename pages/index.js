@@ -7,6 +7,7 @@ export default function Home() {
   const [playerThree] = useState("Z");
   const [winner, setWinner] = useState(null);
   const [playerName, setPlayerName] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [board, setBoard] = useState([
     ["", "", "", "", "", "", ""],
@@ -26,7 +27,7 @@ export default function Home() {
       winner: winnerName === 1 && playerOne || winnerName === 2 && playerTwo || winnerName === 3 && playerThree,
     };
     try {
-      await fetch(`http://localhost:4000/api/v1/game-results`, {
+      await fetch(`https://tick-tak.onrender.com/api/v1/game-results`, {
         method: "post",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(postData),
@@ -37,13 +38,16 @@ export default function Home() {
   }
   async function getData() {
     if(!playerName) return;
+    setLoading(true)
     try {
       const res = await fetch(
-        `http://localhost:4000/api/v1/game-results/${playerName}`
+        `https://tick-tak.onrender.com/api/v1/game-results/${playerName}`
       );
       const data = await res.json();
+      setLoading(false)
       setWinner(data);
     } catch (error) {
+      setLoading(false)
       console.log(error);
     }
   }
@@ -156,7 +160,7 @@ export default function Home() {
         <p>
           Playername must be: {playerOne} | {playerTwo} | {playerThree}{" "}
         </p>
-       {winner && <p>Mr {winner && playerName}: Win: {winner?.wins} | Lost: {winner?.losses}</p>} 
+       {loading ? <p>loading....</p> : winner && <p>Mr {winner && playerName}: Win: {winner?.wins} | Lost: {winner?.losses}</p>} 
         <input
           type="text"
           placeholder="Enter player name"
